@@ -1,0 +1,76 @@
+@import 'tailwindcss';
+
+/*
+  WallinMatch designsystem – golf-inspirerat, premium, mobil-first.
+  Färgerna är valda för hög läsbarhet utomhus i starkt ljus.
+*/
+@theme {
+  --color-fairway-50: #edf7f0;
+  --color-fairway-100: #d3ecda;
+  --color-fairway-200: #a7d9b6;
+  --color-fairway-300: #6fc088;
+  --color-fairway-400: #3fa564;
+  --color-fairway-500: #2b8b4f;
+  --color-fairway-600: #1f6e3e;
+  --color-fairway-700: #185733;
+  --color-fairway-800: #124228;
+  --color-fairway-900: #0b3d2e;
+  --color-fairway-950: #06251c;
+
+  --color-flag-400: #ffb454;
+  --color-flag-500: #f79e2e;
+  --color-flag-600: #e07d12;
+
+  --color-sky-soft: #eef4f8;
+
+  --font-sans:
+    'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+
+  --radius-card: 1.25rem;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #f4f8f5 0%, #e7f0ea 100%);
+  color: var(--color-fairway-950);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Undvik gummibandsscroll som stör scoreinmatning på iOS */
+  overscroll-behavior-y: none;
+}
+
+/* Stäng av dubbelklick-zoom och gör knappar snabba på touch */
+button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Ta bort spinner/pilar på number-inputs för renare siffror */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Säkra ytor för notch/hemknapp */
+.safe-top {
+  padding-top: max(env(safe-area-inset-top), 0px);
+}
+.safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 0px);
+}
