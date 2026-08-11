@@ -13,6 +13,8 @@ beforeEach(() => {
   window.localStorage.clear();
   // jsdom saknar scrollTo – stubba som no-op så navigering inte loggar brus.
   window.scrollTo = () => {};
+  // Bekräfta dialoger automatiskt i testmiljön.
+  window.confirm = () => true;
 });
 
 afterEach(() => {
@@ -107,6 +109,38 @@ describe('WallinMatch – appflöde', () => {
     expect(data.currentTournament.course.name).toBe('Testbanan GK');
     // Inbyggd Viksjö + den nya banan.
     expect(data.courses).toHaveLength(2);
+  });
+
+  it('kan ta bort en egen bana men inte den inbyggda', () => {
+    render(<App />);
+
+    // Skapa en egen bana via en turnering.
+    gotoCourseStep();
+    fireEvent.click(screen.getByText(/Skapa ny bana/i));
+    fireEvent.change(screen.getByPlaceholderText(/Viksjö GK/i), {
+      target: { value: 'Bortabanan GK' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /Skapa turnering/i }));
+
+    // localStorage har nu inbyggd + egen bana.
+    let data = JSON.parse(window.localStorage.getItem('wallinmatch:v1')!);
+    expect(data.courses).toHaveLength(2);
+
+    // Starta om appen och gå in i guiden igen.
+    cleanup();
+    render(<App />);
+    // "Ny turnering" bekräftar (stubbat) att kasta pågående och öppnar guiden.
+    fireEvent.click(screen.getByRole('button', { name: /Ny turnering/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Nästa · Välj bana/i }));
+
+    // Den inbyggda banan har ingen ta-bort-knapp, den egna har det.
+    expect(screen.queryByLabelText(/Ta bort Viksjö GK 9 hål/i)).toBeNull();
+    fireEvent.click(screen.getByLabelText(/Ta bort Bortabanan GK/i));
+
+    data = JSON.parse(window.localStorage.getItem('wallinmatch:v1')!);
+    const names = data.courses.map((c: { name: string }) => c.name);
+    expect(names).toContain('Viksjö GK 9 hål');
+    expect(names).not.toContain('Bortabanan GK');
   });
 
   it('byter till matcher-fliken och visar båda matcherna', () => {

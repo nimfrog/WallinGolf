@@ -17,6 +17,7 @@ import type {
   Tournament,
 } from '../types';
 import { loadAppData, saveAppData } from '../storage/storage';
+import { isBuiltinCourse } from '../data/sampleData';
 import { createId } from '../lib/id';
 import { generateRoundRobinSchedule } from '../logic/schedule';
 import { createInitialScores, isRoundFullyScored, playerIdsInRound } from '../logic/rounds';
@@ -30,6 +31,7 @@ interface AppContextValue {
   createTournament: (players: Player[], course: Course) => Tournament;
   discardCurrentTournament: () => void;
   upsertCourse: (course: Course) => void;
+  deleteCourse: (courseId: string) => void;
 
   startRound: (roundNumber: number) => void;
   setScore: (
@@ -117,6 +119,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
           : [...prev.courses, course],
       };
     });
+  }, []);
+
+  const deleteCourse = useCallback((courseId: string) => {
+    // Inbyggda banor kan inte tas bort (de återskapas ändå vid inläsning).
+    if (isBuiltinCourse(courseId)) return;
+    setData((prev) => ({
+      ...prev,
+      courses: prev.courses.filter((c) => c.id !== courseId),
+    }));
   }, []);
 
   const startRound = useCallback(
@@ -258,6 +269,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       createTournament,
       discardCurrentTournament,
       upsertCourse,
+      deleteCourse,
       startRound,
       setScore,
       ensureHoleDefaults,
@@ -268,6 +280,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       createTournament,
       discardCurrentTournament,
       upsertCourse,
+      deleteCourse,
       startRound,
       setScore,
       ensureHoleDefaults,

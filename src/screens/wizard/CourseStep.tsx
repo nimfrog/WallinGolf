@@ -1,13 +1,15 @@
 import type { Course } from '../../types';
 import type { HoleDraftInput } from '../../logic/validation';
 import { ALLOWED_HOLE_COUNTS } from '../../logic/validation';
+import { isBuiltinCourse } from '../../data/sampleData';
 import { Card, Pill } from '../../ui/components';
-import { MinusIcon, PlusIcon } from '../../ui/Icons';
+import { MinusIcon, PlusIcon, TrashIcon } from '../../ui/Icons';
 
 interface CourseStepProps {
   savedCourses: Course[];
   selectedCourseId: string | null;
   onSelectCourse: (id: string | null) => void;
+  onDeleteCourse: (id: string) => void;
 
   name: string;
   onNameChange: (name: string) => void;
@@ -24,6 +26,7 @@ export function CourseStep({
   savedCourses,
   selectedCourseId,
   onSelectCourse,
+  onDeleteCourse,
   name,
   onNameChange,
   holeCount,
@@ -49,20 +52,42 @@ export function CourseStep({
           <div className="space-y-2">
             {savedCourses.map((c) => {
               const active = selectedCourseId === c.id;
+              const builtin = isBuiltinCourse(c.id);
               return (
                 <Card
                   key={c.id}
                   onClick={() => onSelectCourse(c.id)}
                   className={[
-                    'flex items-center justify-between p-4',
+                    'flex items-center justify-between gap-3 p-4',
                     active ? 'ring-2 ring-fairway-500' : '',
                   ].join(' ')}
                 >
-                  <div>
-                    <p className="font-semibold text-fairway-900">{c.name}</p>
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold text-fairway-900">{c.name}</p>
                     <p className="text-sm text-fairway-500">{c.holes.length} hål</p>
                   </div>
-                  {active && <Pill tone="done">Vald</Pill>}
+                  <div className="flex shrink-0 items-center gap-2">
+                    {active && <Pill tone="done">Vald</Pill>}
+                    {!builtin && (
+                      <button
+                        type="button"
+                        aria-label={`Ta bort ${c.name}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (
+                            window.confirm(
+                              `Ta bort banan "${c.name}"? Detta går inte att ångra.`,
+                            )
+                          ) {
+                            onDeleteCourse(c.id);
+                          }
+                        }}
+                        className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-500 active:bg-red-100"
+                      >
+                        <TrashIcon width={20} height={20} />
+                      </button>
+                    )}
+                  </div>
                 </Card>
               );
             })}

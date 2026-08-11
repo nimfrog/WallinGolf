@@ -89,5 +89,12 @@ export const VIKSJO_9_COURSE: Course = {
  */
 export const BUILTIN_COURSES: Course[] = [VIKSJO_9_COURSE];
 
+const BUILTIN_COURSE_IDS = new Set(BUILTIN_COURSES.map((c) => c.id));
+
+/** true om banan är inbyggd (och därmed inte kan tas bort). */
+export function isBuiltinCourse(id: string): boolean {
+  return BUILTIN_COURSE_IDS.has(id);
+}
+
 /** Standard-par för ett nytt hål beroende på antal hål. */
 export const DEFAULT_PAR = 4;

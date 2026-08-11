@@ -36,7 +36,7 @@ function makeHoleDrafts(count: number, previous: HoleDraftInput[]): HoleDraftInp
 }
 
 export function NewTournamentWizard({ navigate }: { navigate: NavigateFn }) {
-  const { courses, createTournament } = useApp();
+  const { courses, createTournament, deleteCourse } = useApp();
 
   const [step, setStep] = useState<1 | 2>(1);
   const [errors, setErrors] = useState<string[]>([]);
@@ -63,6 +63,14 @@ export function NewTournamentWizard({ navigate }: { navigate: NavigateFn }) {
   const changeHoleCount = (count: number) => {
     setHoleCount(count);
     setHoleDrafts((prev) => makeHoleDrafts(count, prev));
+  };
+
+  const handleDeleteCourse = (id: string) => {
+    deleteCourse(id);
+    if (selectedCourseId === id) {
+      const remaining = courses.filter((c) => c.id !== id);
+      setSelectedCourseId(remaining.length > 0 ? remaining[0].id : null);
+    }
   };
 
   const selectedCourse = useMemo(
@@ -157,6 +165,7 @@ export function NewTournamentWizard({ navigate }: { navigate: NavigateFn }) {
             savedCourses={courses}
             selectedCourseId={selectedCourseId}
             onSelectCourse={setSelectedCourseId}
+            onDeleteCourse={handleDeleteCourse}
             name={courseName}
             onNameChange={setCourseName}
             holeCount={holeCount}

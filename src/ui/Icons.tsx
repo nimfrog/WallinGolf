@@ -99,3 +99,12 @@ export const PlayIcon = (props: IconProps) => (
     <path d="M6 4v16l14-8-14-8Z" />
   </svg>
 );
+
+export const TrashIcon = (props: IconProps) => (
+  <svg {...base(props)}>
+    <path d="M3 6h18" />
+    <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" />
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+    <path d="M10 11v6M14 11v6" />
+  </svg>
+);
