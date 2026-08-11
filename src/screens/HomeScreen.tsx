@@ -20,24 +20,26 @@ export function HomeScreen({ navigate }: { navigate: NavigateFn }) {
   return (
     <div className="flex min-h-full flex-col">
       {/* Hero */}
-      <div className="safe-top bg-fairway-900 px-4 pb-8 pt-10 text-white">
+      <div className="safe-top bg-fairway-900 px-5 pb-10 pt-10 text-white">
         <div className="mx-auto w-full max-w-lg">
           <div className="flex items-center gap-2">
-            <FlagIcon className="text-flag-400" width={28} height={28} />
-            <span className="text-sm font-semibold uppercase tracking-[0.2em] text-fairway-200">
+            <FlagIcon className="text-flag-400" width={26} height={26} />
+            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-fairway-200">
               Golf · Singel matchspel
             </span>
           </div>
-          <h1 className="mt-3 text-5xl font-black tracking-tight">
+          <h1 className="mt-4 text-5xl font-black leading-none tracking-tight">
             Wallin<span className="text-flag-400">Match</span>
           </h1>
-          <p className="mt-2 max-w-sm text-fairway-100">
-            Fyra spelare. Sex matcher. Alla möter alla. Byggd för mobilen ute på banan.
+          <p className="mt-3 max-w-xs text-[15px] leading-relaxed text-fairway-100">
+            Fyra spelare · tre rundor · alla möter alla.
+            <br />
+            Byggd för mobilen ute på banan.
           </p>
         </div>
       </div>
 
-      <main className="mx-auto -mt-4 w-full max-w-lg flex-1 space-y-6 rounded-t-3xl bg-transparent px-4 pb-10 pt-2">
+      <main className="mx-auto w-full max-w-lg flex-1 space-y-6 px-4 pb-10 pt-6">
         {/* Pågående turnering */}
         {currentTournament && (
           <section className="space-y-3">
