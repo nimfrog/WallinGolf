@@ -33,6 +33,8 @@ interface AppContextValue {
   upsertCourse: (course: Course) => void;
   deleteCourse: (courseId: string) => void;
 
+  /** Genererar om matchschemat från en ny spelarordning (endast innan start). */
+  setSchedule: (orderedIds: PlayerId[]) => void;
   startRound: (roundNumber: number) => void;
   setScore: (
     roundNumber: number,
@@ -129,6 +131,30 @@ export function AppProvider({ children }: { children: ReactNode }) {
       courses: prev.courses.filter((c) => c.id !== courseId),
     }));
   }, []);
+
+  const setSchedule = useCallback(
+    (orderedIds: PlayerId[]) => {
+      updateCurrent((t) => {
+        // Endast tillåtet innan någon runda startat.
+        const anyStarted = t.rounds.some((r) => r.status !== 'not_started');
+        if (anyStarted || orderedIds.length !== 4) return t;
+
+        const schedule = generateRoundRobinSchedule(orderedIds);
+        const rounds: Round[] = schedule.map((sched) => ({
+          roundNumber: sched.roundNumber,
+          matches: sched.matches.map((m) => ({
+            id: createId('match'),
+            player1Id: m.player1Id,
+            player2Id: m.player2Id,
+          })),
+          scores: [],
+          status: 'not_started',
+        }));
+        return { ...t, rounds };
+      });
+    },
+    [updateCurrent],
+  );
 
   const startRound = useCallback(
     (roundNumber: number) => {
@@ -270,6 +296,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       discardCurrentTournament,
       upsertCourse,
       deleteCourse,
+      setSchedule,
       startRound,
       setScore,
       ensureHoleDefaults,
@@ -281,6 +308,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       discardCurrentTournament,
       upsertCourse,
       deleteCourse,
+      setSchedule,
       startRound,
       setScore,
       ensureHoleDefaults,

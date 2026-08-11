@@ -143,6 +143,45 @@ describe('WallinMatch – appflöde', () => {
     expect(names).not.toContain('Bortabanan GK');
   });
 
+  it('kan välja motståndare i runda 1 och slumpa lottningen', () => {
+    render(<App />);
+    gotoCourseStep();
+    fireEvent.click(screen.getByRole('button', { name: /Skapa turnering/i }));
+
+    const readTournament = () =>
+      JSON.parse(window.localStorage.getItem('wallinmatch:v1')!).currentTournament;
+
+    let t = readTournament();
+    const byName = Object.fromEntries(
+      t.players.map((p: { id: string; name: string }) => [p.name, p.id]),
+    );
+    const anchorId = t.players[0].id; // Andreas
+
+    // Välj att Andreas möter Melker i runda 1.
+    fireEvent.click(screen.getByRole('button', { name: 'Melker' }));
+
+    t = readTournament();
+    const r1 = t.rounds.find((r: { roundNumber: number }) => r.roundNumber === 1);
+    const anchorMatch = r1.matches.find(
+      (m: { player1Id: string; player2Id: string }) =>
+        m.player1Id === anchorId || m.player2Id === anchorId,
+    );
+    const opp =
+      anchorMatch.player1Id === anchorId
+        ? anchorMatch.player2Id
+        : anchorMatch.player1Id;
+    expect(opp).toBe(byName['Melker']);
+
+    // Slumpa – schemat ska fortfarande ha 3 rundor och 6 unika matcher.
+    fireEvent.click(screen.getByRole('button', { name: /Slumpa lottning/i }));
+    t = readTournament();
+    expect(t.rounds).toHaveLength(3);
+    const pairs = t.rounds.flatMap((r: { matches: { player1Id: string; player2Id: string }[] }) =>
+      r.matches.map((m) => [m.player1Id, m.player2Id].sort().join('-')),
+    );
+    expect(new Set(pairs).size).toBe(6);
+  });
+
   it('byter till matcher-fliken och visar båda matcherna', () => {
     render(<App />);
     createWithViksjoAndStartRound();

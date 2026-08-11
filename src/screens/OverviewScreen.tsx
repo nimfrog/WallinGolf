@@ -48,8 +48,17 @@ function MatchRow({
   );
 }
 
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 export function OverviewScreen({ navigate }: { navigate: NavigateFn }) {
-  const { currentTournament } = useApp();
+  const { currentTournament, setSchedule } = useApp();
 
   if (!currentTournament) {
     return (
@@ -72,6 +81,28 @@ export function OverviewScreen({ navigate }: { navigate: NavigateFn }) {
   const nextPlayable = t.rounds.find((r) => r.status === 'not_started');
 
   const anyCompleted = t.rounds.some((r) => r.status === 'completed');
+  const nothingStarted = t.rounds.every((r) => r.status === 'not_started');
+
+  // Lottning: ankarspelare (spelare 1) och dennes motståndare i runda 1.
+  const anchor = t.players[0];
+  const round1 = t.rounds.find((r) => r.roundNumber === 1);
+  const anchorMatch = round1?.matches.find(
+    (m) => m.player1Id === anchor.id || m.player2Id === anchor.id,
+  );
+  const anchorOpponentId = anchorMatch
+    ? anchorMatch.player1Id === anchor.id
+      ? anchorMatch.player2Id
+      : anchorMatch.player1Id
+    : null;
+
+  const chooseOpponent = (opponentId: string) => {
+    const rest = t.players
+      .filter((p) => p.id !== anchor.id && p.id !== opponentId)
+      .map((p) => p.id);
+    setSchedule([anchor.id, opponentId, ...rest]);
+  };
+
+  const randomize = () => setSchedule(shuffle(t.players.map((p) => p.id)));
 
   const roundActionLabel = (round: Round): string => {
     if (round.status === 'in_progress') return `Fortsätt runda ${round.roundNumber}`;
@@ -85,6 +116,44 @@ export function OverviewScreen({ navigate }: { navigate: NavigateFn }) {
       onBack={() => navigate({ name: 'home' })}
     >
       <div className="space-y-6">
+        {nothingStarted && (
+          <section className="space-y-3">
+            <SectionTitle>Lottning</SectionTitle>
+            <Card className="space-y-4 p-4">
+              <div>
+                <p className="mb-2 text-sm font-medium text-fairway-700">
+                  Vem möter {anchor.name} i runda 1?
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {t.players
+                    .filter((p) => p.id !== anchor.id)
+                    .map((p) => {
+                      const active = anchorOpponentId === p.id;
+                      return (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => chooseOpponent(p.id)}
+                          className={[
+                            'rounded-xl px-4 py-2.5 text-sm font-semibold',
+                            active
+                              ? 'bg-fairway-600 text-white'
+                              : 'bg-fairway-100 text-fairway-700 active:bg-fairway-200',
+                          ].join(' ')}
+                        >
+                          {p.name}
+                        </button>
+                      );
+                    })}
+                </div>
+              </div>
+              <Button variant="secondary" onClick={randomize}>
+                🎲 Slumpa lottning
+              </Button>
+            </Card>
+          </section>
+        )}
+
         <section className="space-y-3">
           <SectionTitle>Rundor</SectionTitle>
           {t.rounds.map((round) => {
