@@ -13,6 +13,7 @@ import {
 } from '../../data/sampleData';
 import { createId } from '../../lib/id';
 import { parseHandicap } from '../../lib/format';
+import { deriveDraftHandicap } from '../../logic/draftHandicap';
 import {
   buildCourse,
   validateCourse,
@@ -64,20 +65,39 @@ export function NewTournamentWizard({ navigate }: { navigate: NavigateFn }) {
     setHoleDrafts((prev) => makeHoleDrafts(count, prev));
   };
 
+  const selectedCourse = useMemo(
+    () =>
+      selectedCourseId ? (courses.find((c) => c.id === selectedCourseId) ?? null) : null,
+    [selectedCourseId, courses],
+  );
+
+  const derived = useMemo(
+    () => drafts.map((d) => deriveDraftHandicap(d, selectedCourse)),
+    [drafts, selectedCourse],
+  );
+
   const players: Player[] = useMemo(
     () =>
-      drafts.map((d) => ({
+      drafts.map((d, i) => ({
         id: createId('player'),
         name: d.name.trim(),
         exactHandicap: parseHandicap(d.exactHandicap) ?? 0,
-        playingHandicap: Math.round(parseHandicap(d.playingHandicap) ?? 0),
+        playingHandicap: derived[i].effective ?? 0,
         tee: d.tee,
+        gender: d.gender,
       })),
-    [drafts],
+    [drafts, derived],
   );
 
   const goToCourse = () => {
-    const errs = validatePlayers(drafts);
+    const errs = validatePlayers(
+      drafts.map((d, i) => ({
+        name: d.name,
+        exactHandicap: d.exactHandicap,
+        tee: d.tee,
+        playingHandicap: derived[i].effective,
+      })),
+    );
     if (errs.length > 0) {
       setErrors(errs);
       return;
@@ -131,7 +151,7 @@ export function NewTournamentWizard({ navigate }: { navigate: NavigateFn }) {
         <ErrorBanner messages={errors} />
 
         {step === 1 ? (
-          <PlayersStep drafts={drafts} onChange={updateDraft} />
+          <PlayersStep drafts={drafts} derived={derived} onChange={updateDraft} />
         ) : (
           <CourseStep
             savedCourses={courses}

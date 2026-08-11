@@ -1,4 +1,4 @@
-import type { Hole, PlayerId } from '../types';
+import type { Course, Gender, Hole, PlayerId, Tee, TeeRating } from '../types';
 
 /**
  * Skillnaden i spelhandicap mellan två spelare (alltid ≥ 0).
@@ -50,6 +50,38 @@ export function calculateReceivedStrokesPerHole(
 /** Nettoscore på ett hål: gross minus erhållna slag. */
 export function calculateNetScore(grossScore: number, receivedStrokes: number): number {
   return grossScore - receivedStrokes;
+}
+
+/** Slår upp slope-rating för en given tee och kön på en bana. */
+export function findTeeRating(
+  course: Course,
+  tee: Tee,
+  gender: Gender | undefined,
+): TeeRating | undefined {
+  if (!course.ratings) return undefined;
+  return course.ratings.find(
+    (r) => r.tee === tee && (gender == null || r.gender === gender),
+  );
+}
+
+/**
+ * Beräknar spelhandicap (course handicap) från exakt handicap och slope-rating.
+ *
+ * Course Rating och par i ratingen anges som 18-hålsvärden. Resultatet skalas
+ * till antalet spelade hål (t.ex. ×9/18 för en 9-hålsrunda) enligt:
+ *
+ *   spelhandicap = round( (exaktHCP × Slope/113 + (CR − Par18)) × antalHål/18 )
+ */
+export function calculatePlayingHandicap(
+  exactHandicap: number,
+  rating: TeeRating,
+  holeCount: number,
+): number {
+  const full18 =
+    exactHandicap * (rating.slope / 113) + (rating.courseRating - rating.par);
+  const scaled = full18 * (holeCount / 18);
+  const rounded = Math.round(scaled);
+  return rounded === 0 ? 0 : rounded; // undvik -0
 }
 
 export interface MatchStrokeAllocation {

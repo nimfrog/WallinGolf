@@ -8,7 +8,9 @@ import {
   determineHoleWinner,
   calculateMatchState,
   calculateStandings,
+  calculatePlayingHandicap,
 } from '../index';
+import type { TeeRating } from '../../types';
 
 /* --- Testhjälpare --------------------------------------------------------- */
 
@@ -137,6 +139,44 @@ describe('handicapfördelning', () => {
     expect(dist.get(16)).toBe(1);
     expect(dist.get(15)).toBe(0);
     expect([...dist.values()].reduce((a, b) => a + b, 0)).toBe(3);
+  });
+});
+
+/* --- Spelhandicap från slope (9-hål, Viksjö) ----------------------------- */
+
+describe('calculatePlayingHandicap (9-hål)', () => {
+  const gulHerr: TeeRating = {
+    tee: 'Gul',
+    gender: 'herr',
+    courseRating: 59.3,
+    slope: 101,
+    par: 60,
+  };
+  const rodDam: TeeRating = {
+    tee: 'Röd',
+    gender: 'dam',
+    courseRating: 58.4,
+    slope: 91,
+    par: 60,
+  };
+
+  it('räknar 9-hålsspelhandicap från exakt HCP, slope och CR', () => {
+    // (27.8 × 101/113 + (59.3−60)) × 9/18 = 12.07 → 12
+    expect(calculatePlayingHandicap(27.8, gulHerr, 9)).toBe(12);
+    // (9.2 × 101/113 − 0.7) × 0.5 = 3.76 → 4
+    expect(calculatePlayingHandicap(9.2, gulHerr, 9)).toBe(4);
+    // (22.8 × 91/113 + (58.4−60)) × 0.5 = 8.38 → 8
+    expect(calculatePlayingHandicap(22.8, rodDam, 9)).toBe(8);
+  });
+
+  it('scratch (HCP 0) ger ungefär CR−par halverat', () => {
+    // (0 + (59.3−60)) × 0.5 = −0.35 → 0
+    expect(calculatePlayingHandicap(0, gulHerr, 9)).toBe(0);
+  });
+
+  it('full skala på 18 hål ger dubbelt mot 9 hål-termen', () => {
+    // 18-hål: 27.8 × 101/113 + (59.3−60) = 24.15 → 24
+    expect(calculatePlayingHandicap(27.8, gulHerr, 18)).toBe(24);
   });
 });
 

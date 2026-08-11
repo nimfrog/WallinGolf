@@ -1,4 +1,4 @@
-import type { Course } from '../types';
+import type { Course, Gender } from '../types';
 
 /** Exempelnamn enligt specifikationen (endast förslag, kan ändras fritt). */
 export const SAMPLE_PLAYER_NAMES = ['Andreas', 'Martin', 'Jessica', 'Melker'] as const;
@@ -6,17 +6,49 @@ export const SAMPLE_PLAYER_NAMES = ['Andreas', 'Martin', 'Jessica', 'Melker'] as
 export interface PlayerDraft {
   name: string;
   exactHandicap: string;
-  playingHandicap: string;
+  gender: Gender;
   tee: string;
+  /** Manuellt spelhandicap – används när automatisk beräkning inte kan göras. */
+  manualPlayingHandicap: string;
+  /** Om användaren valt att ange spelhandicap manuellt istället för beräknat. */
+  overridePlayingHandicap: boolean;
 }
 
 /** Fyra exempelspelare som förifyllda utkast i guiden. */
 export function createSamplePlayerDrafts(): PlayerDraft[] {
   return [
-    { name: 'Andreas', exactHandicap: '27,1', playingHandicap: '28', tee: 'Gul' },
-    { name: 'Martin', exactHandicap: '15,4', playingHandicap: '16', tee: 'Gul' },
-    { name: 'Jessica', exactHandicap: '22,8', playingHandicap: '25', tee: 'Röd' },
-    { name: 'Melker', exactHandicap: '9,2', playingHandicap: '10', tee: 'Gul' },
+    {
+      name: 'Andreas',
+      exactHandicap: '27,8',
+      gender: 'herr',
+      tee: 'Gul',
+      manualPlayingHandicap: '28',
+      overridePlayingHandicap: false,
+    },
+    {
+      name: 'Martin',
+      exactHandicap: '15,4',
+      gender: 'herr',
+      tee: 'Gul',
+      manualPlayingHandicap: '16',
+      overridePlayingHandicap: false,
+    },
+    {
+      name: 'Jessica',
+      exactHandicap: '22,8',
+      gender: 'dam',
+      tee: 'Röd',
+      manualPlayingHandicap: '25',
+      overridePlayingHandicap: false,
+    },
+    {
+      name: 'Melker',
+      exactHandicap: '9,2',
+      gender: 'herr',
+      tee: 'Gul',
+      manualPlayingHandicap: '10',
+      overridePlayingHandicap: false,
+    },
   ];
 }
 
@@ -41,6 +73,13 @@ export const VIKSJO_9_COURSE: Course = {
     { number: 7, par: 3, strokeIndex: 13 },
     { number: 8, par: 3, strokeIndex: 17 },
     { number: 9, par: 3, strokeIndex: 15 },
+  ],
+  // Slope-ratings enligt klubbens slopetabell (18-hålsvärden, par 60).
+  ratings: [
+    { tee: 'Gul', gender: 'herr', courseRating: 59.3, slope: 101, par: 60 },
+    { tee: 'Röd', gender: 'herr', courseRating: 54.9, slope: 92, par: 60 },
+    { tee: 'Gul', gender: 'dam', courseRating: 61.3, slope: 97, par: 60 },
+    { tee: 'Röd', gender: 'dam', courseRating: 58.4, slope: 91, par: 60 },
   ],
 };
 

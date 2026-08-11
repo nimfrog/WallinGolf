@@ -11,14 +11,33 @@ export type PlayerId = string;
 /** En tee, t.ex. "Gul" eller "Röd". Fritt textfält. */
 export type Tee = string;
 
+export type Gender = 'herr' | 'dam';
+
 export interface Player {
   id: PlayerId;
   name: string;
-  /** Exakt handicap, t.ex. 27.1. Anges av användaren, endast informativt. */
+  /** Exakt handicap, t.ex. 27.1. */
   exactHandicap: number;
-  /** Spelhandicap – heltal som anges manuellt och används i all matchlogik. */
+  /** Spelhandicap – heltal som används i all matchlogik. */
   playingHandicap: number;
   tee: Tee;
+  /** Kön, används för att välja rätt slope-rating. Valfritt. */
+  gender?: Gender;
+}
+
+/**
+ * Slope-rating för en tee (och kön). Course Rating och par anges som
+ * ratingens 18-hålsvärden (så som de står i slopetabellen); appen skalar
+ * automatiskt till antalet spelade hål.
+ */
+export interface TeeRating {
+  tee: Tee;
+  gender: Gender;
+  /** Course Rating (18-hål), t.ex. 59.3. */
+  courseRating: number;
+  slope: number;
+  /** Par som ratingen avser (18-hål), t.ex. 60. */
+  par: number;
 }
 
 export interface Hole {
@@ -34,6 +53,8 @@ export interface Course {
   name: string;
   /** 9, 12 eller 18 hål. */
   holes: Hole[];
+  /** Valfria slope-ratings per tee/kön för automatisk spelhandicap. */
+  ratings?: TeeRating[];
 }
 
 /** En registrerad gross-score för en spelare på ett specifikt hål. */

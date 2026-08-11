@@ -11,6 +11,8 @@ import App from './App';
 
 beforeEach(() => {
   window.localStorage.clear();
+  // jsdom saknar scrollTo – stubba som no-op så navigering inte loggar brus.
+  window.scrollTo = () => {};
 });
 
 afterEach(() => {
