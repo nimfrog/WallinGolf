@@ -1,5 +1,4 @@
-import type { Course, Hole } from '../types';
-import { createId } from '../lib/id';
+import type { Course } from '../types';
 
 /** Exempelnamn enligt specifikationen (endast förslag, kan ändras fritt). */
 export const SAMPLE_PLAYER_NAMES = ['Andreas', 'Martin', 'Jessica', 'Melker'] as const;
@@ -24,21 +23,32 @@ export function createSamplePlayerDrafts(): PlayerDraft[] {
 /** Vanliga tee-alternativ. */
 export const TEE_OPTIONS = ['Vit', 'Gul', 'Blå', 'Röd', 'Orange'] as const;
 
-/** Skapar en exempelbana: Viksjö GK 9 hål. */
-export function createSampleCourse(): Course {
-  const holes: Hole[] = [
-    { number: 1, par: 4, strokeIndex: 5 },
-    { number: 2, par: 3, strokeIndex: 9 },
-    { number: 3, par: 5, strokeIndex: 1 },
-    { number: 4, par: 4, strokeIndex: 3 },
-    { number: 5, par: 4, strokeIndex: 7 },
-    { number: 6, par: 3, strokeIndex: 8 },
-    { number: 7, par: 5, strokeIndex: 2 },
-    { number: 8, par: 4, strokeIndex: 4 },
-    { number: 9, par: 4, strokeIndex: 6 },
-  ];
-  return { id: createId('course'), name: 'Viksjö GK', holes };
-}
+/**
+ * Viksjö GK 9 hål – officiell bandata (par och 18-hålsindex från scorekortet).
+ * Stroke Index anges som de officiella hålindexen (udda 1–17); det är den
+ * inbördes ordningen som styr slagfördelningen.
+ */
+export const VIKSJO_9_COURSE: Course = {
+  id: 'course_viksjo_9',
+  name: 'Viksjö GK 9 hål',
+  holes: [
+    { number: 1, par: 3, strokeIndex: 7 },
+    { number: 2, par: 4, strokeIndex: 3 },
+    { number: 3, par: 4, strokeIndex: 5 },
+    { number: 4, par: 3, strokeIndex: 11 },
+    { number: 5, par: 4, strokeIndex: 1 },
+    { number: 6, par: 3, strokeIndex: 9 },
+    { number: 7, par: 3, strokeIndex: 13 },
+    { number: 8, par: 3, strokeIndex: 17 },
+    { number: 9, par: 3, strokeIndex: 15 },
+  ],
+};
+
+/**
+ * Inbyggda banor som alltid finns tillgängliga i appen (kan återanvändas
+ * direkt utan att matas in manuellt).
+ */
+export const BUILTIN_COURSES: Course[] = [VIKSJO_9_COURSE];
 
 /** Standard-par för ett nytt hål beroende på antal hål. */
 export const DEFAULT_PAR = 4;

@@ -1,12 +1,20 @@
-import type { AppData } from '../types';
+import type { AppData, Course } from '../types';
+import { BUILTIN_COURSES } from '../data/sampleData';
 
 const STORAGE_KEY = 'wallinmatch:v1';
 
 const EMPTY: AppData = {
   currentTournament: null,
   history: [],
-  courses: [],
+  courses: [...BUILTIN_COURSES],
 };
+
+/** Säkerställer att inbyggda banor alltid finns med (utan dubbletter). */
+function withBuiltinCourses(courses: Course[]): Course[] {
+  const existingIds = new Set(courses.map((c) => c.id));
+  const missing = BUILTIN_COURSES.filter((c) => !existingIds.has(c.id));
+  return [...missing, ...courses];
+}
 
 /** Läser hela app-tillståndet från localStorage. Returnerar tomt vid fel. */
 export function loadAppData(): AppData {
@@ -18,7 +26,7 @@ export function loadAppData(): AppData {
     return {
       currentTournament: parsed.currentTournament ?? null,
       history: Array.isArray(parsed.history) ? parsed.history : [],
-      courses: Array.isArray(parsed.courses) ? parsed.courses : [],
+      courses: withBuiltinCourses(Array.isArray(parsed.courses) ? parsed.courses : []),
     };
   } catch (err) {
     console.error('Kunde inte läsa sparad data:', err);

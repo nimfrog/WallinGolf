@@ -77,9 +77,12 @@ export function validateCourse(
     if (!Number.isInteger(par) || par < 3 || par > 6) {
       errors.push(`Hål ${h.number}: par måste vara mellan 3 och 6.`);
     }
+    // Stroke Index anges 1–18 (9-hålsbanor använder ofta officiella
+    // 18-hålsindex, t.ex. udda tal 1–17). Det är ordningen som styr
+    // slagfördelningen, så unika värden räcker.
     const si = Number(h.strokeIndex);
-    if (!Number.isInteger(si) || si < 1 || si > holeCount) {
-      errors.push(`Hål ${h.number}: Stroke Index måste vara 1–${holeCount}.`);
+    if (!Number.isInteger(si) || si < 1 || si > 18) {
+      errors.push(`Hål ${h.number}: Stroke Index måste vara 1–18.`);
     } else {
       parsedSI.push(si);
     }
