@@ -13,10 +13,10 @@ export interface PlayerDraft {
 /** Fyra exempelspelare som förifyllda utkast i guiden. */
 export function createSamplePlayerDrafts(): PlayerDraft[] {
   return [
-    { name: 'Andreas', exactHandicap: '27,8', gender: 'herr', tee: 'Gul' },
-    { name: 'Martin', exactHandicap: '15,4', gender: 'herr', tee: 'Gul' },
-    { name: 'Jessica', exactHandicap: '22,8', gender: 'dam', tee: 'Röd' },
-    { name: 'Melker', exactHandicap: '9,2', gender: 'herr', tee: 'Gul' },
+    { name: 'Andreas', exactHandicap: '27,1', gender: 'herr', tee: 'Gul' },
+    { name: 'Martin', exactHandicap: '22,9', gender: 'herr', tee: 'Gul' },
+    { name: 'Jessica', exactHandicap: '43,2', gender: 'dam', tee: 'Röd' },
+    { name: 'Melker', exactHandicap: '47,3', gender: 'herr', tee: 'Gul' },
   ];
 }
 
