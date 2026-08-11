@@ -1,5 +1,5 @@
 import type { AppData, Course } from '../types';
-import { BUILTIN_COURSES } from '../data/sampleData';
+import { BUILTIN_COURSES, isBuiltinCourse } from '../data/sampleData';
 
 const STORAGE_KEY = 'wallinmatch:v1';
 
@@ -9,11 +9,14 @@ const EMPTY: AppData = {
   courses: [...BUILTIN_COURSES],
 };
 
-/** Säkerställer att inbyggda banor alltid finns med (utan dubbletter). */
+/**
+ * Säkerställer att inbyggda banor alltid finns med och alltid speglar kodens
+ * aktuella definition (par, Stroke Index, slopedata). Ev. tidigare sparad
+ * variant med samma id ersätts, egna banor behålls.
+ */
 function withBuiltinCourses(courses: Course[]): Course[] {
-  const existingIds = new Set(courses.map((c) => c.id));
-  const missing = BUILTIN_COURSES.filter((c) => !existingIds.has(c.id));
-  return [...missing, ...courses];
+  const userCourses = courses.filter((c) => !isBuiltinCourse(c.id));
+  return [...BUILTIN_COURSES, ...userCourses];
 }
 
 /** Läser hela app-tillståndet från localStorage. Returnerar tomt vid fel. */

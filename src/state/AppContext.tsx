@@ -17,7 +17,7 @@ import type {
   Tournament,
 } from '../types';
 import { loadAppData, saveAppData } from '../storage/storage';
-import { isBuiltinCourse } from '../data/sampleData';
+import { BUILTIN_COURSES, isBuiltinCourse } from '../data/sampleData';
 import { createId } from '../lib/id';
 import { generateRoundRobinSchedule } from '../logic/schedule';
 import { createInitialScores, isRoundFullyScored, playerIdsInRound } from '../logic/rounds';
@@ -137,8 +137,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const recalculatePlayingHandicaps = useCallback(() => {
     updateCurrent((t) => {
+      // Om den inbäddade banan saknar slopedata, använd den inbyggda
+      // definitionen med samma id (t.ex. äldre sparad Viksjö utan ratings).
+      const ratingsCourse =
+        t.course.ratings && t.course.ratings.length > 0
+          ? t.course
+          : (BUILTIN_COURSES.find((c) => c.id === t.course.id) ?? t.course);
+
       const players = t.players.map((p) => {
-        const rating = findTeeRating(t.course, p.tee, p.gender);
+        const rating = findTeeRating(ratingsCourse, p.tee, p.gender);
         if (!rating) return p;
         return {
           ...p,
