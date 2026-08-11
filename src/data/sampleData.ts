@@ -43,11 +43,73 @@ export const VIKSJO_9_COURSE: Course = {
     { number: 9, par: 3, strokeIndex: 15 },
   ],
   // Slope-ratings enligt klubbens slopetabell (18-hålsvärden, par 60).
+  // `table` är klubbens exakta spelhandicaptabell (2017) och används vid
+  // beräkning; CR/Slope behålls för visning. Spelhandicap för 9 hål = tabellens
+  // 18-hålsvärde delat på två (avrundat).
   ratings: [
-    { tee: 'Gul', gender: 'herr', courseRating: 59.3, slope: 101, par: 60 },
-    { tee: 'Röd', gender: 'herr', courseRating: 54.9, slope: 92, par: 60 },
-    { tee: 'Gul', gender: 'dam', courseRating: 61.3, slope: 97, par: 60 },
-    { tee: 'Röd', gender: 'dam', courseRating: 58.4, slope: 91, par: 60 },
+    {
+      tee: 'Gul',
+      gender: 'herr',
+      courseRating: 59.3,
+      slope: 101,
+      par: 60,
+      table: {
+        start: -4,
+        lowerBounds: [
+          -4, -3.1, -2, -0.8, 0.3, 1.4, 2.5, 3.6, 4.7, 5.9, 7, 8.1, 9.2, 10.3,
+          11.5, 12.6, 13.7, 14.8, 15.9, 17.1, 18.2, 19.3, 20.4, 21.5, 22.6, 23.8,
+          24.9, 26, 27.1, 28.2, 29.4, 30.5, 31.6, 32.7, 33.8, 35, 37, 38, 39, 40,
+          41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54,
+        ],
+      },
+    },
+    {
+      tee: 'Röd',
+      gender: 'herr',
+      courseRating: 54.9,
+      slope: 92,
+      par: 60,
+      table: {
+        start: -8,
+        lowerBounds: [
+          -4, -2.9, -1.7, -0.4, 0.8, 2, 3.2, 4.5, 5.7, 6.9, 8.2, 9.4, 10.6, 11.8,
+          13.1, 14.3, 15.5, 16.8, 18, 19.2, 20.4, 21.7, 22.9, 24.1, 25.4, 26.6,
+          27.8, 29, 30.3, 31.5, 32.7, 33.9, 35.2, 37, 38, 39, 40, 41, 42, 43, 44,
+          45, 46, 47, 48, 49, 50, 51, 52, 53, 54,
+        ],
+      },
+    },
+    {
+      tee: 'Gul',
+      gender: 'dam',
+      courseRating: 61.3,
+      slope: 97,
+      par: 60,
+      table: {
+        start: -2,
+        lowerBounds: [
+          -4, -3.2, -2, -0.9, 0.3, 1.4, 2.6, 3.8, 4.9, 6.1, 7.3, 8.4, 9.6, 10.8,
+          11.9, 13.1, 14.3, 15.4, 16.6, 17.8, 18.9, 20.1, 21.3, 22.4, 23.6, 24.7,
+          25.9, 27.1, 28.2, 29.4, 30.6, 31.7, 32.9, 34.1, 35.2,
+        ],
+      },
+    },
+    {
+      tee: 'Röd',
+      gender: 'dam',
+      courseRating: 58.4,
+      slope: 91,
+      par: 60,
+      table: {
+        start: -5,
+        lowerBounds: [
+          -4, -3.6, -2.3, -1.1, 0.2, 1.4, 2.7, 3.9, 5.1, 6.4, 7.6, 8.9, 10.1,
+          11.3, 12.6, 13.8, 15.1, 16.3, 17.6, 18.8, 20, 21.3, 22.5, 23.8, 25,
+          26.3, 27.5, 28.7, 30, 31.2, 32.5, 33.7, 34.9, 37, 38, 39, 40, 41, 42,
+          43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54,
+        ],
+      },
+    },
   ],
 };
 

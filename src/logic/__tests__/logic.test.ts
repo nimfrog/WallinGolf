@@ -9,8 +9,10 @@ import {
   calculateMatchState,
   calculateStandings,
   calculatePlayingHandicap,
+  findTeeRating,
 } from '../index';
 import type { TeeRating } from '../../types';
+import { VIKSJO_9_COURSE } from '../../data/sampleData';
 
 /* --- Testhjälpare --------------------------------------------------------- */
 
@@ -177,6 +179,35 @@ describe('calculatePlayingHandicap (9-hål)', () => {
   it('full skala på 18 hål ger dubbelt mot 9 hål-termen', () => {
     // 18-hål: 27.8 × 101/113 + (59.3−60) = 24.15 → 24
     expect(calculatePlayingHandicap(27.8, gulHerr, 18)).toBe(24);
+  });
+});
+
+/* --- Viksjös exakta slopetabell ------------------------------------------ */
+
+describe('Viksjö exakt slopetabell (klubbens 2017-tabell)', () => {
+  const r = (tee: string, gender: 'herr' | 'dam') =>
+    findTeeRating(VIKSJO_9_COURSE, tee, gender)!;
+
+  it('herr röd HCP 47 ger 35 över 18 hål och 18 över 9 hål', () => {
+    expect(calculatePlayingHandicap(47, r('Röd', 'herr'), 18)).toBe(35);
+    expect(calculatePlayingHandicap(47, r('Röd', 'herr'), 9)).toBe(18);
+  });
+
+  it('herr gul HCP 47 ger 42 över 18 och 21 över 9', () => {
+    expect(calculatePlayingHandicap(47, r('Gul', 'herr'), 18)).toBe(42);
+    expect(calculatePlayingHandicap(47, r('Gul', 'herr'), 9)).toBe(21);
+  });
+
+  it('exempelspelarnas 9-håls spelhandicap', () => {
+    expect(calculatePlayingHandicap(27.1, r('Gul', 'herr'), 9)).toBe(12); // Andreas
+    expect(calculatePlayingHandicap(22.9, r('Gul', 'herr'), 9)).toBe(10); // Martin
+    expect(calculatePlayingHandicap(43.2, r('Röd', 'dam'), 9)).toBe(17); // Jessica
+    expect(calculatePlayingHandicap(47.3, r('Gul', 'herr'), 9)).toBe(21); // Melker
+  });
+
+  it('scratch (HCP 0) följer tabellens startvärden', () => {
+    expect(calculatePlayingHandicap(0, r('Gul', 'herr'), 18)).toBe(-1);
+    expect(calculatePlayingHandicap(0, r('Röd', 'herr'), 18)).toBe(-5);
   });
 });
 

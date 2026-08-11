@@ -64,23 +64,35 @@ export function findTeeRating(
   );
 }
 
+/** Slår upp spelhandicap (18-hål) i en exakt slopetabell. */
+export function lookupHandicapTable(
+  table: { start: number; lowerBounds: number[] },
+  exactHandicap: number,
+): number {
+  let idx = 0;
+  for (let i = 0; i < table.lowerBounds.length; i++) {
+    if (exactHandicap >= table.lowerBounds[i]) idx = i;
+  }
+  return table.start + idx;
+}
+
 /**
- * Beräknar spelhandicap (course handicap) från exakt handicap och slope-rating.
+ * Beräknar spelhandicap (course handicap) från exakt handicap och slope-rating,
+ * skalat till antalet spelade hål (t.ex. ×9/18 för en 9-hålsrunda).
  *
- * Course Rating och par i ratingen anges som 18-hålsvärden. Resultatet skalas
- * till antalet spelade hål (t.ex. ×9/18 för en 9-hålsrunda) enligt:
- *
- *   spelhandicap = round( (exaktHCP × Slope/113 + (CR − Par18)) × antalHål/18 )
+ * Finns en exakt slopetabell (rating.table) används den – då matchar värdet
+ * klubbens tryckta tabell exakt. Annars används standardformeln:
+ *   round( (exaktHCP × Slope/113 + (CR − Par18)) × antalHål/18 )
  */
 export function calculatePlayingHandicap(
   exactHandicap: number,
   rating: TeeRating,
   holeCount: number,
 ): number {
-  const full18 =
-    exactHandicap * (rating.slope / 113) + (rating.courseRating - rating.par);
-  const scaled = full18 * (holeCount / 18);
-  const rounded = Math.round(scaled);
+  const full18 = rating.table
+    ? lookupHandicapTable(rating.table, exactHandicap)
+    : exactHandicap * (rating.slope / 113) + (rating.courseRating - rating.par);
+  const rounded = Math.round(full18 * (holeCount / 18));
   return rounded === 0 ? 0 : rounded; // undvik -0
 }
 

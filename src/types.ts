@@ -26,6 +26,18 @@ export interface Player {
 }
 
 /**
+ * Exakt spelhandicaptabell (klubbens officiella slopetabell). Varje rad höjer
+ * spelhandicap med 1, så det räcker med startvärdet och radernas undre gränser
+ * (exakt handicap) i stigande ordning. Värdet avser 18 hål (par 60).
+ */
+export interface PlayingHandicapTable {
+  /** Spelhandicap (18-hål) för första raden. */
+  start: number;
+  /** Undre gräns i exakt handicap för varje rad, stigande. Plus-hcp = negativt. */
+  lowerBounds: number[];
+}
+
+/**
  * Slope-rating för en tee (och kön). Course Rating och par anges som
  * ratingens 18-hålsvärden (så som de står i slopetabellen); appen skalar
  * automatiskt till antalet spelade hål.
@@ -38,6 +50,11 @@ export interface TeeRating {
   slope: number;
   /** Par som ratingen avser (18-hål), t.ex. 60. */
   par: number;
+  /**
+   * Klubbens exakta slopetabell. Om den finns används den istället för
+   * formeln (matchar den tryckta tabellen slag för slag).
+   */
+  table?: PlayingHandicapTable;
 }
 
 export interface Hole {
