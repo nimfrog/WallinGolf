@@ -14,7 +14,7 @@ export function HomeScreen({ navigate }: { navigate: NavigateFn }) {
   const resumeTarget = () => {
     if (!currentTournament) return;
     if (activeRound) navigate({ name: 'round', roundNumber: activeRound.roundNumber });
-    else navigate({ name: 'new' });
+    else navigate({ name: 'overview' });
   };
 
   return (

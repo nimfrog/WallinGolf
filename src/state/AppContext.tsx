@@ -21,6 +21,7 @@ import { isBuiltinCourse } from '../data/sampleData';
 import { createId } from '../lib/id';
 import { generateRoundRobinSchedule } from '../logic/schedule';
 import { createInitialScores, isRoundFullyScored, playerIdsInRound } from '../logic/rounds';
+import { calculatePlayingHandicap, findTeeRating } from '../logic/handicap';
 
 interface AppContextValue {
   data: AppData;
@@ -32,6 +33,8 @@ interface AppContextValue {
   discardCurrentTournament: () => void;
   upsertCourse: (course: Course) => void;
   deleteCourse: (courseId: string) => void;
+  /** Räknar om alla spelares spelhandicap från exakt HCP + banans slopedata. */
+  recalculatePlayingHandicaps: () => void;
 
   /** Genererar om matchschemat från en ny spelarordning (endast innan start). */
   setSchedule: (orderedIds: PlayerId[]) => void;
@@ -131,6 +134,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
       courses: prev.courses.filter((c) => c.id !== courseId),
     }));
   }, []);
+
+  const recalculatePlayingHandicaps = useCallback(() => {
+    updateCurrent((t) => {
+      const players = t.players.map((p) => {
+        const rating = findTeeRating(t.course, p.tee, p.gender);
+        if (!rating) return p;
+        return {
+          ...p,
+          playingHandicap: calculatePlayingHandicap(
+            p.exactHandicap,
+            rating,
+            t.course.holes.length,
+          ),
+        };
+      });
+      return { ...t, players };
+    });
+  }, [updateCurrent]);
 
   const setSchedule = useCallback(
     (orderedIds: PlayerId[]) => {
@@ -296,6 +317,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       discardCurrentTournament,
       upsertCourse,
       deleteCourse,
+      recalculatePlayingHandicaps,
       setSchedule,
       startRound,
       setScore,
@@ -308,6 +330,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       discardCurrentTournament,
       upsertCourse,
       deleteCourse,
+      recalculatePlayingHandicaps,
       setSchedule,
       startRound,
       setScore,

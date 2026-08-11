@@ -8,6 +8,8 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import App from './App';
+import { VIKSJO_9_COURSE } from './data/sampleData';
+import { generateRoundRobinSchedule } from './logic/schedule';
 
 beforeEach(() => {
   window.localStorage.clear();
@@ -180,6 +182,76 @@ describe('WallinMatch – appflöde', () => {
       r.matches.map((m) => [m.player1Id, m.player2Id].sort().join('-')),
     );
     expect(new Set(pairs).size).toBe(6);
+  });
+
+  it('sätter automatiskt spelhandicap på spelarna vid skapande med Viksjö', () => {
+    render(<App />);
+    gotoCourseStep();
+    fireEvent.click(screen.getByRole('button', { name: /Skapa turnering/i }));
+
+    const t = JSON.parse(window.localStorage.getItem('wallinmatch:v1')!).currentTournament;
+    const hcp = Object.fromEntries(
+      t.players.map((p: { name: string; playingHandicap: number }) => [
+        p.name,
+        p.playingHandicap,
+      ]),
+    );
+    // Exakt HCP 27,1 / 22,9 / 43,2 / 47,3 på Viksjö (9 hål) ska ge:
+    expect(hcp.Andreas).toBe(12);
+    expect(hcp.Martin).toBe(10);
+    expect(hcp.Jessica).toBe(17);
+    expect(hcp.Melker).toBe(21);
+    // Minst en spelare får alltså erhållna slag i en match.
+    expect(Math.max(...(Object.values(hcp) as number[]))).toBeGreaterThan(0);
+  });
+
+  it('kan räkna om spelhandicap för en äldre turnering med 0 slag', () => {
+    // Seeda en "gammal" turnering där spelarna har spelhandicap 0.
+    const ids = ['p1', 'p2', 'p3', 'p4'];
+    const players = [
+      { id: 'p1', name: 'Andreas', exactHandicap: 27.1, playingHandicap: 0, tee: 'Gul', gender: 'herr' },
+      { id: 'p2', name: 'Martin', exactHandicap: 22.9, playingHandicap: 0, tee: 'Gul', gender: 'herr' },
+      { id: 'p3', name: 'Jessica', exactHandicap: 43.2, playingHandicap: 0, tee: 'Röd', gender: 'dam' },
+      { id: 'p4', name: 'Melker', exactHandicap: 47.3, playingHandicap: 0, tee: 'Gul', gender: 'herr' },
+    ];
+    const rounds = generateRoundRobinSchedule(ids).map((s) => ({
+      roundNumber: s.roundNumber,
+      matches: s.matches.map((m, i) => ({
+        id: `r${s.roundNumber}m${i}`,
+        player1Id: m.player1Id,
+        player2Id: m.player2Id,
+      })),
+      scores: [],
+      status: 'not_started',
+    }));
+    const tournament = {
+      id: 't1',
+      createdAt: '2026-08-11T00:00:00.000Z',
+      players,
+      course: VIKSJO_9_COURSE,
+      rounds,
+      status: 'active',
+    };
+    window.localStorage.setItem(
+      'wallinmatch:v1',
+      JSON.stringify({ currentTournament: tournament, history: [], courses: [VIKSJO_9_COURSE] }),
+    );
+
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: /Fortsätt/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Räkna om/i }));
+
+    const t = JSON.parse(window.localStorage.getItem('wallinmatch:v1')!).currentTournament;
+    const hcp = Object.fromEntries(
+      t.players.map((p: { name: string; playingHandicap: number }) => [
+        p.name,
+        p.playingHandicap,
+      ]),
+    );
+    expect(hcp.Andreas).toBe(12);
+    expect(hcp.Martin).toBe(10);
+    expect(hcp.Jessica).toBe(17);
+    expect(hcp.Melker).toBe(21);
   });
 
   it('byter till matcher-fliken och visar båda matcherna', () => {

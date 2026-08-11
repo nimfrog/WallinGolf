@@ -8,6 +8,7 @@ import { PlayIcon } from '../ui/Icons';
 import { calculateStandings } from '../logic/standings';
 import { calculateRoundMatchStates } from '../logic/rounds';
 import type { MatchState } from '../logic/match';
+import { formatNumber } from '../lib/format';
 
 function nameOf(players: Player[], id: string): string {
   return players.find((p) => p.id === id)?.name ?? '—';
@@ -58,7 +59,7 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export function OverviewScreen({ navigate }: { navigate: NavigateFn }) {
-  const { currentTournament, setSchedule } = useApp();
+  const { currentTournament, setSchedule, recalculatePlayingHandicaps } = useApp();
 
   if (!currentTournament) {
     return (
@@ -153,6 +154,45 @@ export function OverviewScreen({ navigate }: { navigate: NavigateFn }) {
             </Card>
           </section>
         )}
+
+        <section className="space-y-3">
+          <SectionTitle
+            right={
+              t.course.ratings && t.course.ratings.length > 0 ? (
+                <button
+                  type="button"
+                  onClick={recalculatePlayingHandicaps}
+                  className="text-sm font-semibold text-fairway-600"
+                >
+                  Räkna om
+                </button>
+              ) : undefined
+            }
+          >
+            Spelhandicap
+          </SectionTitle>
+          <Card className="p-2">
+            <div className="divide-y divide-fairway-100">
+              {t.players.map((p) => (
+                <div
+                  key={p.id}
+                  className="flex items-center justify-between gap-3 px-2 py-2.5"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold text-fairway-900">{p.name}</p>
+                    <p className="text-xs text-fairway-500">
+                      {p.tee}
+                      {p.gender ? ` · ${p.gender}` : ''} · exakt {formatNumber(p.exactHandicap)}
+                    </p>
+                  </div>
+                  <span className="text-2xl font-black tabular-nums text-fairway-900">
+                    {p.playingHandicap}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </section>
 
         <section className="space-y-3">
           <SectionTitle>Rundor</SectionTitle>
