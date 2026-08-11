@@ -5,8 +5,6 @@ export interface PlayerDraftInput {
   name: string;
   exactHandicap: string;
   tee: string;
-  /** Effektivt spelhandicap (beräknat eller manuellt). null = saknas/ogiltigt. */
-  playingHandicap: number | null;
 }
 
 export interface HoleDraftInput {
@@ -36,9 +34,6 @@ export function validatePlayers(players: PlayerDraftInput[]): string[] {
     }
     if (parseHandicap(p.exactHandicap) == null) {
       errors.push(`${label}: ange ett giltigt exakt handicap.`);
-    }
-    if (p.playingHandicap == null || !Number.isInteger(p.playingHandicap)) {
-      errors.push(`${label}: spelhandicap måste vara ett heltal.`);
     }
     if (p.tee.trim() === '') {
       errors.push(`${label}: välj tee.`);

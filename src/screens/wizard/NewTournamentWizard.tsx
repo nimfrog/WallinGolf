@@ -3,7 +3,7 @@ import type { NavigateFn } from '../../navigation';
 import type { Player } from '../../types';
 import { useApp } from '../../state/AppContext';
 import { ScreenShell } from '../../ui/ScreenShell';
-import { Button, ErrorBanner } from '../../ui/components';
+import { Button, Card, ErrorBanner, SectionTitle } from '../../ui/components';
 import { PlayersStep } from './PlayersStep';
 import { CourseStep } from './CourseStep';
 import {
@@ -90,7 +90,7 @@ export function NewTournamentWizard({ navigate }: { navigate: NavigateFn }) {
         id: createId('player'),
         name: d.name.trim(),
         exactHandicap: parseHandicap(d.exactHandicap) ?? 0,
-        playingHandicap: derived[i].effective ?? 0,
+        playingHandicap: derived[i].playingHandicap ?? 0,
         tee: d.tee,
         gender: d.gender,
       })),
@@ -99,11 +99,10 @@ export function NewTournamentWizard({ navigate }: { navigate: NavigateFn }) {
 
   const goToCourse = () => {
     const errs = validatePlayers(
-      drafts.map((d, i) => ({
+      drafts.map((d) => ({
         name: d.name,
         exactHandicap: d.exactHandicap,
         tee: d.tee,
-        playingHandicap: derived[i].effective,
       })),
     );
     if (errs.length > 0) {
@@ -159,20 +158,55 @@ export function NewTournamentWizard({ navigate }: { navigate: NavigateFn }) {
         <ErrorBanner messages={errors} />
 
         {step === 1 ? (
-          <PlayersStep drafts={drafts} derived={derived} onChange={updateDraft} />
+          <PlayersStep drafts={drafts} onChange={updateDraft} />
         ) : (
-          <CourseStep
-            savedCourses={courses}
-            selectedCourseId={selectedCourseId}
-            onSelectCourse={setSelectedCourseId}
-            onDeleteCourse={handleDeleteCourse}
-            name={courseName}
-            onNameChange={setCourseName}
-            holeCount={holeCount}
-            onHoleCountChange={changeHoleCount}
-            holes={holeDrafts}
-            onHoleChange={updateHole}
-          />
+          <>
+            <CourseStep
+              savedCourses={courses}
+              selectedCourseId={selectedCourseId}
+              onSelectCourse={setSelectedCourseId}
+              onDeleteCourse={handleDeleteCourse}
+              name={courseName}
+              onNameChange={setCourseName}
+              holeCount={holeCount}
+              onHoleCountChange={changeHoleCount}
+              holes={holeDrafts}
+              onHoleChange={updateHole}
+            />
+
+            {/* Automatiskt beräknat spelhandicap när banan valts */}
+            <div className="mt-6 space-y-2">
+              <SectionTitle>Spelhandicap (beräknas från banan)</SectionTitle>
+              <Card className="p-2">
+                <div className="divide-y divide-fairway-100">
+                  {drafts.map((d, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between gap-3 px-2 py-2.5"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate font-semibold text-fairway-900">
+                          {d.name.trim() || `Spelare ${i + 1}`}
+                        </p>
+                        <p className="text-xs text-fairway-500">
+                          {d.tee} · {d.gender}
+                        </p>
+                      </div>
+                      {derived[i].playingHandicap != null ? (
+                        <span className="text-2xl font-black tabular-nums text-fairway-900">
+                          {derived[i].playingHandicap}
+                        </span>
+                      ) : (
+                        <span className="max-w-[9rem] text-right text-xs text-fairway-400">
+                          Ingen slopedata · 0 slag
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </div>
+          </>
         )}
       </div>
 

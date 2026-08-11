@@ -8,52 +8,20 @@ export interface PlayerDraft {
   exactHandicap: string;
   gender: Gender;
   tee: string;
-  /** Manuellt spelhandicap – används när automatisk beräkning inte kan göras. */
-  manualPlayingHandicap: string;
-  /** Om användaren valt att ange spelhandicap manuellt istället för beräknat. */
-  overridePlayingHandicap: boolean;
 }
 
 /** Fyra exempelspelare som förifyllda utkast i guiden. */
 export function createSamplePlayerDrafts(): PlayerDraft[] {
   return [
-    {
-      name: 'Andreas',
-      exactHandicap: '27,8',
-      gender: 'herr',
-      tee: 'Gul',
-      manualPlayingHandicap: '28',
-      overridePlayingHandicap: false,
-    },
-    {
-      name: 'Martin',
-      exactHandicap: '15,4',
-      gender: 'herr',
-      tee: 'Gul',
-      manualPlayingHandicap: '16',
-      overridePlayingHandicap: false,
-    },
-    {
-      name: 'Jessica',
-      exactHandicap: '22,8',
-      gender: 'dam',
-      tee: 'Röd',
-      manualPlayingHandicap: '25',
-      overridePlayingHandicap: false,
-    },
-    {
-      name: 'Melker',
-      exactHandicap: '9,2',
-      gender: 'herr',
-      tee: 'Gul',
-      manualPlayingHandicap: '10',
-      overridePlayingHandicap: false,
-    },
+    { name: 'Andreas', exactHandicap: '27,8', gender: 'herr', tee: 'Gul' },
+    { name: 'Martin', exactHandicap: '15,4', gender: 'herr', tee: 'Gul' },
+    { name: 'Jessica', exactHandicap: '22,8', gender: 'dam', tee: 'Röd' },
+    { name: 'Melker', exactHandicap: '9,2', gender: 'herr', tee: 'Gul' },
   ];
 }
 
-/** Vanliga tee-alternativ. */
-export const TEE_OPTIONS = ['Vit', 'Gul', 'Blå', 'Röd', 'Orange'] as const;
+/** Tee-alternativ. */
+export const TEE_OPTIONS = ['Gul', 'Röd'] as const;
 
 /**
  * Viksjö GK 9 hål – officiell bandata (par och 18-hålsindex från scorekortet).
